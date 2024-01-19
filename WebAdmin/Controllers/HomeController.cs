@@ -14,7 +14,7 @@ namespace WebAdmin.Controllers
         }
 
         /// <summary>
-        /// That are comment define by Staging branch, that will conflick with Develop, that should resolving when merge code
+        /// Merged (Dev & Staging)That are comment define by Staging branch, that will conflick with Develop, that should resolving when merge code
         /// </summary>
         /// <returns></returns>
         public IActionResult Index()
