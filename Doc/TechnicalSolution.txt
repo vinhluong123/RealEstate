@@ -1,0 +1,4 @@
+--- Reference code solution: D:\Coding\Testing\NetMVC\NetMVCRazor
+
+This file will provided techincal issues and solution on RealEstate project
+- how to add ignore file under BIN/ RELEASE folder
