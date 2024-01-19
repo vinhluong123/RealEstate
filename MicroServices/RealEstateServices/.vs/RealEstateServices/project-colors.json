@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "6a5db392-f4ea-4151-a35a-b4e3232ed67f": {
+      "ProjectGuid": "6a5db392-f4ea-4151-a35a-b4e3232ed67f",
+      "DisplayName": "RealEstateServices",
+      "ColorIndex": 0
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Miscellaneous Files",
+      "ColorIndex": -1
+    }
+  },
+  "NextColorIndex": 1
+}

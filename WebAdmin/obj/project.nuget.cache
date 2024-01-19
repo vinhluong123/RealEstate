@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "SCdf+rGFMSzdsJz91JR4yyMErqdTP87a3ueJByR4El/d5pA8zqMBt283RA7WCtveUAXfknWNqNL7HgykCIXdOA==",
+  "success": true,
+  "projectFilePath": "D:\\Coding\\RealEstate_Project\\WebAdmin\\WebAdmin.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\vinh luong\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.14.0\\microsoft.visualstudio.azure.containers.tools.targets.1.14.0.nupkg.sha512"
+  ],
+  "logs": []
+}
