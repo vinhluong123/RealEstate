@@ -27,6 +27,10 @@ namespace WebAdmin.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Add note for error too, from Staging branch
+        /// </summary>
+        /// <returns></returns>
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
