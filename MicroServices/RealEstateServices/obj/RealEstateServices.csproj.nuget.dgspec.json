@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Coding\\RealEstate\\MicroServices\\RealEstateServices\\RealEstateServices.csproj": {}
+    "D:\\Coding\\RealEstate_Project\\MicroServices\\RealEstateServices\\RealEstateServices.csproj": {}
   },
   "projects": {
-    "D:\\Coding\\RealEstate\\MicroServices\\RealEstateServices\\RealEstateServices.csproj": {
+    "D:\\Coding\\RealEstate_Project\\MicroServices\\RealEstateServices\\RealEstateServices.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Coding\\RealEstate\\MicroServices\\RealEstateServices\\RealEstateServices.csproj",
+        "projectUniqueName": "D:\\Coding\\RealEstate_Project\\MicroServices\\RealEstateServices\\RealEstateServices.csproj",
         "projectName": "RealEstateServices",
-        "projectPath": "D:\\Coding\\RealEstate\\MicroServices\\RealEstateServices\\RealEstateServices.csproj",
+        "projectPath": "D:\\Coding\\RealEstate_Project\\MicroServices\\RealEstateServices\\RealEstateServices.csproj",
         "packagesPath": "C:\\Users\\vinh luong\\.nuget\\packages\\",
-        "outputPath": "D:\\Coding\\RealEstate\\MicroServices\\RealEstateServices\\obj\\",
+        "outputPath": "D:\\Coding\\RealEstate_Project\\MicroServices\\RealEstateServices\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\vinh luong\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -40,13 +40,27 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[6.0.23, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.23, )"
+            },
             "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
               "target": "Package",
               "version": "[1.14.0, )"
             },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[6.0.16, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
-              "version": "[6.2.3, )"
+              "version": "[6.5.0, )"
             }
           },
           "imports": [
