@@ -53,7 +53,7 @@ namespace Microservices_Net5.Controllers
         [HttpPost]
         public async Task<ActionResult<Student>> CreateStudent([FromBody] Student student)
         {
-            if (student.ID == 0)
+            if (student.ID == 1)
             {
                 return null;
             }
