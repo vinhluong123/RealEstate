@@ -13,6 +13,10 @@ namespace WebAdmin.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Add comment for Index function under HomeController, that code change defined in branch : Develop
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Index()
         {
             return View();
