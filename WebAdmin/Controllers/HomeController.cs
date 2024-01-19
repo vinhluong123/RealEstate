@@ -22,10 +22,6 @@ namespace WebAdmin.Controllers
             return View();
         }
 
-        /// <summary>
-        /// Will be remove after revert code 
-        /// </summary>
-        /// <returns></returns>
         public IActionResult Privacy()
         {
             return View();
