@@ -7,6 +7,9 @@ namespace WebAdmin.Models
     {
         public string? RequestId { get; set; }
 
+        /// <summary>
+        /// More note after Class comment above, Expect that code merged will exclude Class comment
+        /// </summary>
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
     }
 }
