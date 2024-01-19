@@ -13,6 +13,10 @@ namespace WebAdmin.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// That are comment define by Staging branch, that will conflick with Develop, that should resolving when merge code
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Index()
         {
             return View();
