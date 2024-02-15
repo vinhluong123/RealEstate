@@ -1,0 +1,88 @@
+name: Monorepo CI/CD - .NET
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build_admin:
+    runs-on: windows-latest
+    if: ${{ github.event_name == 'push' && (contains(github.event.commits[0].added, 'web-admin/') || contains(github.event.commits[0].modified, 'web-admin/')) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Build Web Admin
+        run: |
+          cd web-admin
+          dotnet build
+
+  build_api:
+    runs-on: windows-latest
+    if: ${{ github.event_name == 'push' && (contains(github.event.commits[0].added, 'api/') || contains(github.event.commits[0].modified, 'api/')) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Build API Services
+        run: |
+          cd api
+          dotnet build
+
+  build_client:
+    runs-on: windows-latest
+    if: ${{ github.event_name == 'push' && (contains(github.event.commits[0].added, 'client/') || contains(github.event.commits[0].modified, 'client/')) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Build Client Website
+        run: |
+          cd client
+          dotnet build
+
+  run_tests:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Run Tests
+        run: |
+          # Execute tests common to all projects
+
+  deploy:
+    needs: [build_admin, build_api, build_client, run_tests]
+    runs-on: windows-latest
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: dotnet-artifacts
+
+      - name: Deploy to Production
+        # Use your deployment method here
