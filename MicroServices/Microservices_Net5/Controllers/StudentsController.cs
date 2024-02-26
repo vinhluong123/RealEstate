@@ -1,11 +1,11 @@
-﻿using Microservices_Net5.Models;
+﻿using Microservices_Net5.DTOs;
+using Microservices_Net5.Models;
+using Microservices_Net5.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Microservices_Net5.Controllers
@@ -14,20 +14,20 @@ namespace Microservices_Net5.Controllers
     [ApiController]
     public class StudentsController : ControllerBase
     {
-        private readonly SchoolContext _context;
+        private readonly IStudentRepository _studentRespository;
 
-        public StudentsController(SchoolContext context)
+        public StudentsController(IStudentRepository studentRespository)
         {
-            _context = context;
+            _studentRespository = studentRespository;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Student>> GetTodoItem(int id)
+        public async Task<ActionResult<StudentDTO>> GetTodoItem(int id)
         {
             try
             {
-                var students = await _context.Students.FindAsync(id);
-                return students;
+                var students = await _studentRespository.GetStudent(id);
+                return Ok(students);
             }
             catch (Exception ex)
             {
@@ -36,19 +36,24 @@ namespace Microservices_Net5.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Student>>> GetALl(int id)
+        public async Task<ActionResult<IEnumerable<Student>>> GetALl()
         {
             try
             {
-                var a = 1 / id;
-                var students = await _context.Students.ToListAsync();
-                return students;
+                var students = await _studentRespository.GetStudent();
+                return Ok(students);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.ToString());
             }
         }
+
+        /// <summary>
+        /// Add comment
+        /// </summary>
+        /// <param name="student"></param>
+        /// <returns></returns>
 
         [HttpPost]
         public async Task<ActionResult<Student>> CreateStudent([FromBody] Student student)

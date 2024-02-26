@@ -1,0 +1,38 @@
+version: '3.4'
+
+services:
+  api:
+    image: lhvinh/microservicesnet5
+    container_name: Microservices_Net5_api
+    build:
+      context: .
+      dockerfile: Microservices_Net5/Dockerfile
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+      - SQLSERVER=server=person_db;database=ContosoUniversity;User id=sa;Password=12345678x@X;MultipleActiveResultSets=true;TrustServerCertificate=True;
+    ports:
+      - "8001:80"
+      - "8002:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    restart: always
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    container_name: Microservices_Net5_db
+    volumes:
+      - db_data:/var/opt/mssql/data
+    environment:
+      MSSQL_SA_PASSWORD: "12345678x@X"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    ports:
+      - "1441:1433"
+    restart: always
+
+volumes:
+  db_data:
