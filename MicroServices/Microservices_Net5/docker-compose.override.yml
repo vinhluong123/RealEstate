@@ -1,13 +1,32 @@
 version: '3.4'
 
+networks:
+  demoblazorapp:
+
 services:
-  microservices_net5:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+  demoappdb:
+    container_name: app-db
+    image: mcr.microsoft.com/mssql/server:2019-latest
     ports:
-      - "80"
-      - "443"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=12345678x@X
+    networks:
+      - demoblazorapp
+  demoblazorserverapp:
+    container_name: demo-blazor-app
+    image: microservicesapi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8001:80
+    depends_on:
+      - demoappdb
+    environment:
+      - DB_HOST=demoappdb
+      - DB_NAME=DemoBlazorApp
+      - DB_SA_PASSWORD=12345678x@X
+    networks:
+      - demoblazorapp
