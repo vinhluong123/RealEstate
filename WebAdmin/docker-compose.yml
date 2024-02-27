@@ -1,0 +1,32 @@
+version: '3.4'
+
+networks:
+  demoblazorapp:
+
+services:
+  demoappdb:
+    container_name: app-db
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=12345678x@X
+    networks:
+      - demoblazorapp
+  demoblazorserverapp:
+    container_name: web-admin
+    image: webadmin-image
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8001:80
+    depends_on:
+      - demoappdb
+    environment:
+      - DB_HOST=demoappdb
+      - DB_NAME=DemoBlazorApp
+      - DB_SA_PASSWORD=12345678x@X
+    networks:
+      - demoblazorapp
