@@ -1,8 +1,31 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    @model IEnumerable<WeatherForecastModel>
+
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome First Admin Web Application</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+<table class="table">
+        <tdead>
+            <tr>
+                <th>Date</th>
+                <th>Temperature C</th>
+                <th>Temperature F</th>
+                <th>Summary</th>
+            </tr>
+        </tdead>
+            <tbody>
+                @foreach (var item in Model)
+               {
+                    <tr>
+                        <td>@item.Date</td>
+                        <td>@item.TemperatureC</td>
+                        <td>@item.TemperatureF</td>
+                        <td>@item.Summary</td>
+                    </tr>
+               }
+            </tbody>
+    </table>
