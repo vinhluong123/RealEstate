@@ -2,7 +2,7 @@
 
 namespace WebAdmin.Controllers
 {
-    public class UserController : Controller
+    public class StudentController : Controller
     {
         public IActionResult Index()
         {
