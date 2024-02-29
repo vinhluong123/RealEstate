@@ -17,61 +17,117 @@ namespace Microservices_Net5.Helper
 {
     public static class JwtBearerConfiguration
     {
-        public static AuthenticationBuilder AddJwtBearerConfiguration(this AuthenticationBuilder builder, string issuer, string audience, string secret)
+        public static void AddJwtBearerConfiguration(IServiceCollection services, IConfiguration configuration)
         {
-            return builder.AddJwtBearer(options =>
-            {  
+            services.AddAuthentication(options =>
+           {
+               options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+               options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+           })
+            .AddJwtBearer(options =>
+            {
                 options.RequireHttpsMetadata = false;
-                options.TokenValidationParameters = new TokenValidationParameters()
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuer = issuer,
-                    ValidAudience = audience,                                        
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Jwt:Secret"])),
                     ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = false,
+                    ValidateAudience = false
                 };
+
                 options.Events = new JwtBearerEvents()
                 {
                     OnMessageReceived = context =>
                     {
                         var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
                         context.Token = token ;
-                        var isvalidate = ValidateToken(token, issuer, audience, secret);
+                        var isvalidate = ValidateToken(token, configuration["Jwt:Secret"]);
                         return Task.CompletedTask;
-                    },
-                    //OnChallenge = context =>
-                    //{
-                    //    context.HandleResponse();
-                    //    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    //    context.Response.ContentType = "application/json";
-
-                    //    // Ensure we always have an error and error description.
-                    //    if (string.IsNullOrEmpty(context.Error))
-                    //        context.Error = "invalid_token";
-                    //    if (string.IsNullOrEmpty(context.ErrorDescription))
-                    //        context.ErrorDescription = "This request requires a valid JWT access token to be provided";
-
-                    //    // Add some extra context for expired tokens.
-                    //    if (context.AuthenticateFailure != null && context.AuthenticateFailure.GetType() == typeof(SecurityTokenExpiredException))
-                    //    {
-                    //        var authenticationException = context.AuthenticateFailure as SecurityTokenExpiredException;
-                    //        context.Response.Headers.Add("x-token-expired", authenticationException.Expires.ToString("o"));
-                    //        context.ErrorDescription = $"The token expired on {authenticationException.Expires.ToString("o")}";
-                    //    }
-
-                    //    return context.Response.WriteAsync(JsonSerializer.Serialize(new
-                    //    {
-                    //        error = context.Error,
-                    //        error_description = context.ErrorDescription
-                    //    }));
-                    //}
+                    }
                 };
             });
         }
 
 
+        public static ClaimsPrincipal ValidateToken(string token, string secret)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(secret);
 
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                RequireExpirationTime = true,
+                ValidateLifetime = true
+            };
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
+                return principal;
+            }
+            catch (Exception)
+            {
+                return null; // Token validation failed
+            }
+        }
+
+
+        #region TempCode
+        /// <summary>
+        /// Generate token
+
+        /// </summary>
+        /// <param name="_configuration"></param>
+        /// <returns></returns>
+        public static string GenerateToken(this IConfiguration configuration)
+        {
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(configuration["Jwt:Secret"]);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, "lhvinh"),
+                    new Claim("Id", Guid.NewGuid().ToString()),
+                    new Claim("Roles","user roles listing here"),
+                    new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+                }),
+                Expires = DateTime.UtcNow.AddHours(1), // Token expiration time
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+
+
+            //var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            //var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            ////Create Security Token object by giving required parameters
+            //var secToken = new JwtSecurityToken(
+            //    signingCredentials: credentials,
+            //    issuer: _configuration["JWT:ValidIssuer"],
+            //    audience: _configuration["JWT:ValidAudience"],
+            //    claims: new[]
+            //    {
+            //        new Claim(JwtRegisteredClaimNames.Sub, "lhvinh"),
+            //        new Claim("Id", Guid.NewGuid().ToString()),
+            //        new Claim("Roles","user roles listing here"),
+            //        new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+            //    },
+            //    expires: DateTime.UtcNow.AddMinutes(15)
+            //    );
+
+            //var token = new JwtSecurityTokenHandler().WriteToken(secToken);
+            //return token;
+        }
         public static void SetupJWTServices(IServiceCollection services)
         {
             string key = "my_secret_key_12345"; //this should be same which is used while creating token      
@@ -130,36 +186,6 @@ namespace Microservices_Net5.Helper
               };
           });
         }
-
-        /// <summary>
-        /// Generate token
-        
-        /// </summary>
-        /// <param name="_configuration"></param>
-        /// <returns></returns>
-        public static string GenerateToken(this IConfiguration _configuration)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            //Create Security Token object by giving required parameters
-            var secToken = new JwtSecurityToken(
-                signingCredentials: credentials,
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                claims: new[]
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, "lhvinh"),
-                    new Claim("Roles","user roles listing here"),
-                    new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
-                },
-                expires: DateTime.UtcNow.AddMinutes(15)                
-                );
-
-            var token = new JwtSecurityTokenHandler().WriteToken(secToken);
-            return token;
-        }
-
         private static bool ValidateToken1(string token, string issuer, string audience, string secret)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -167,31 +193,6 @@ namespace Microservices_Net5.Helper
             SecurityToken validatedToken;
             IPrincipal principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
             return true;
-        }
-
-        public static ClaimsPrincipal ValidateToken(string token, string issuer, string audience, string secret)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            var validationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                RequireExpirationTime = true,
-                ValidateLifetime = true
-            };
-
-            try
-            {
-                var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
-                return principal;
-            }
-            catch (Exception)
-            {
-                return null; // Token validation failed
-            }
         }
 
         private static TokenValidationParameters GetValidationParameters(string issuer, string audience, string secret)
@@ -206,5 +207,8 @@ namespace Microservices_Net5.Helper
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)) // The same key as the one that generate the token
             };
         }
+        #endregion
+
+
     }
 }

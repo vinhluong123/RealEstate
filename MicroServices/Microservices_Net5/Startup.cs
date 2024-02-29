@@ -36,19 +36,18 @@ namespace Microservices_Net5
             ////////////////////////////////////////////////////////
 
            // Configure JWT authentication.
-           services.AddAuthentication(options =>
-           {
-               options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-               options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-               options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-           })
-            .AddJwtBearerConfiguration(
-               Configuration["JWT:ValidIssuer"],
-               Configuration["JWT:ValidAudience"],
-               Configuration["JWT:Secret"]
-             );
+           //services.AddAuthentication(options =>
+           //{
+           //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+           //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+           //})
+           // .AddJwtBearerConfiguration(
+           //    Configuration["JWT:ValidIssuer"],
+           //    Configuration["JWT:ValidAudience"],
+           //    Configuration["JWT:Secret"]
+           //  );
 
-            //JwtBearerConfiguration.SetupJWTServices(services);
+            JwtBearerConfiguration.AddJwtBearerConfiguration(services, Configuration);
             services.AddControllersWithViews();
 
             // Add repository here
