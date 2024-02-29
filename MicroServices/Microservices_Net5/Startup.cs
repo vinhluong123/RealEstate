@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microservices_Net5.Repository;
+using Microservices_Net5.Helper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Microservices_Net5
 {
@@ -28,22 +30,30 @@ namespace Microservices_Net5
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Microservices_Net5", Version = "v1" });
             });
 
-            // Start connection for DbContext
-            services.AddDbContext<SchoolContext>(options =>
-        options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            // For Entity Framework
+            services.AddDbContext<SchoolContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-        
+            ////////////////////////////////////////////////////////
+
+           // Configure JWT authentication.
+           services.AddAuthentication(options =>
+           {
+               options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+               options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+               options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+           })
+            .AddJwtBearerConfiguration(
+               Configuration["JWT:ValidIssuer"],
+               Configuration["JWT:ValidAudience"],
+               Configuration["JWT:Secret"]
+             );
+
+            //JwtBearerConfiguration.SetupJWTServices(services);
             services.AddControllersWithViews();
-            
+
             // Add repository here
             services.AddScoped<IStudentRepository, StudentRepository>();
 
-            // Add Automapper
-            //var configuration = new MapperConfiguration(cfg =>
-            //{
-            //    cfg.CreateMap<Foo, FooDto>();
-            //    cfg.CreateMap<Bar, BarDto>();
-            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,12 +71,16 @@ namespace Microservices_Net5
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            //when a request will come to server, It will find token & will try to validate it. If token is valid, It will set User.Identity.IsAuthenticated to true and it will also set claims in 'User.Identity'.
+            app.UseAuthorization();            
+            app.UseAuthentication();
+            ///////-----------------///////////
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
         }
+
     }
 }
