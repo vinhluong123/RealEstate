@@ -33,21 +33,8 @@ namespace Microservices_Net5
             // For Entity Framework
             services.AddDbContext<SchoolContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            ////////////////////////////////////////////////////////
-
-           // Configure JWT authentication.
-           //services.AddAuthentication(options =>
-           //{
-           //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-           //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-           //})
-           // .AddJwtBearerConfiguration(
-           //    Configuration["JWT:ValidIssuer"],
-           //    Configuration["JWT:ValidAudience"],
-           //    Configuration["JWT:Secret"]
-           //  );
-
-            JwtBearerConfiguration.AddJwtBearerConfiguration(services, Configuration);
+           
+            JwtBearerConfiguration.Register(services, Configuration);
             services.AddControllersWithViews();
 
             // Add repository here
@@ -70,9 +57,12 @@ namespace Microservices_Net5
 
             app.UseRouting();
 
-            //when a request will come to server, It will find token & will try to validate it. If token is valid, It will set User.Identity.IsAuthenticated to true and it will also set claims in 'User.Identity'.
-            app.UseAuthorization();            
+            //when a request will come to server, It will find token & will try to validate it.
+            //If token is valid, It will set User.Identity.IsAuthenticated to true and it will also set claims in 'User.Identity'.
+            // Important: the order of Authen and Authorization
             app.UseAuthentication();
+            app.UseAuthorization();
+            
             ///////-----------------///////////
 
             app.UseEndpoints(endpoints =>

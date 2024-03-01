@@ -17,7 +17,7 @@ namespace Microservices_Net5.Helper
 {
     public static class JwtBearerConfiguration
     {
-        public static void AddJwtBearerConfiguration(IServiceCollection services, IConfiguration configuration)
+        public static void Register(IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthentication(options =>
            {
@@ -40,11 +40,43 @@ namespace Microservices_Net5.Helper
                 {
                     OnMessageReceived = context =>
                     {
+                        // Extract the token from the request headers
                         var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
-                        context.Token = token ;
-                        var isvalidate = ValidateToken(token, configuration["Jwt:Secret"]);
+
+                        // Validate the token
+                        var principal = ValidateToken(token, configuration["Jwt:Secret"]);
+
+                        if (principal != null)
+                        {
+                            // If the token is valid, set the principal in the context
+                            context.Principal = principal;
+                        }
+
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        // This event occurs after the token has been successfully validated
+                        // You can perform additional checks or add custom claims to the user's identity
+
+                        // For example, you might want to add custom claims based on user roles or permissions
+                        var identity = context.Principal.Identity as ClaimsIdentity;
+                        identity.AddClaim(new Claim("custom_claim", "some_value"));
+
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = context =>
+                    {
+                        // This event occurs when the authentication process fails due to an invalid token,
+                        // expired token, or any other authentication-related errors
+
+                        var errorMessage = context.Exception.Message;
+                        // Log the authentication failure
+                        //logger.LogError("Authentication failed: " + context.Exception.Message);
+
                         return Task.CompletedTask;
                     }
+
                 };
             });
         }
@@ -70,14 +102,12 @@ namespace Microservices_Net5.Helper
                 var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
                 return principal;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return null; // Token validation failed
             }
         }
 
-
-        #region TempCode
         /// <summary>
         /// Generate token
 
@@ -96,6 +126,7 @@ namespace Microservices_Net5.Helper
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, "lhvinh"),
                     new Claim("Id", Guid.NewGuid().ToString()),
+                    new Claim("Name", "lhvinh"),
                     new Claim("Roles","user roles listing here"),
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
                 }),
@@ -107,108 +138,9 @@ namespace Microservices_Net5.Helper
             return tokenHandler.WriteToken(token);
 
 
-            //var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-            //var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            ////Create Security Token object by giving required parameters
-            //var secToken = new JwtSecurityToken(
-            //    signingCredentials: credentials,
-            //    issuer: _configuration["JWT:ValidIssuer"],
-            //    audience: _configuration["JWT:ValidAudience"],
-            //    claims: new[]
-            //    {
-            //        new Claim(JwtRegisteredClaimNames.Sub, "lhvinh"),
-            //        new Claim("Id", Guid.NewGuid().ToString()),
-            //        new Claim("Roles","user roles listing here"),
-            //        new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
-            //    },
-            //    expires: DateTime.UtcNow.AddMinutes(15)
-            //    );
-
-            //var token = new JwtSecurityTokenHandler().WriteToken(secToken);
-            //return token;
-        }
-        public static void SetupJWTServices(IServiceCollection services)
-        {
-            string key = "my_secret_key_12345"; //this should be same which is used while creating token      
-            var issuer = "http://mysite.com";  //this should be same which is used while creating token  
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-          .AddJwtBearer(options =>
-          {
-              options.RequireHttpsMetadata = false;
-              options.TokenValidationParameters = new TokenValidationParameters
-              {
-                  ValidateIssuer = true,
-                  ValidateAudience = true,
-                  ValidateIssuerSigningKey = true,
-                  ValidIssuer = issuer,
-                  ValidAudience = issuer,
-                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
-              };
-
-              options.Events = new JwtBearerEvents
-              {
-                  //OnAuthenticationFailed = context =>
-                  //{
-                  //    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-                  //    {
-                  //        context.Response.Headers.Add("Token-Expired", "true");
-                  //    }
-                  //    return Task.CompletedTask;
-                  //},
-                  OnChallenge = context =>
-                  {
-                      context.HandleResponse();
-                      context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                      context.Response.ContentType = "application/json";
-
-                      // Ensure we always have an error and error description.
-                      if (string.IsNullOrEmpty(context.Error))
-                          context.Error = "invalid_token";
-                      if (string.IsNullOrEmpty(context.ErrorDescription))
-                          context.ErrorDescription = "This request requires a valid JWT access token to be provided";
-
-                      // Add some extra context for expired tokens.
-                      if (context.AuthenticateFailure != null && context.AuthenticateFailure.GetType() == typeof(SecurityTokenExpiredException))
-                      {
-                          var authenticationException = context.AuthenticateFailure as SecurityTokenExpiredException;
-                          context.Response.Headers.Add("x-token-expired", authenticationException.Expires.ToString("o"));
-                          context.ErrorDescription = $"The token expired on {authenticationException.Expires.ToString("o")}";
-                      }
-
-                      return context.Response.WriteAsync(JsonSerializer.Serialize(new
-                      {
-                          error = context.Error,
-                          error_description = context.ErrorDescription
-                      }));
-                  }
-              };
-          });
-        }
-        private static bool ValidateToken1(string token, string issuer, string audience, string secret)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var validationParameters = GetValidationParameters(issuer, audience, secret);
-            SecurityToken validatedToken;
-            IPrincipal principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
-            return true;
         }
 
-        private static TokenValidationParameters GetValidationParameters(string issuer, string audience, string secret)
-        {
-            return new TokenValidationParameters()
-            {
-                ValidateLifetime = false, // Because there is no expiration in the generated token
-                ValidateAudience = false, // Because there is no audiance in the generated token
-                ValidateIssuer = false,   // Because there is no issuer in the generated token
-                ValidIssuer = issuer,
-                ValidAudience = audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)) // The same key as the one that generate the token
-            };
-        }
-        #endregion
 
-
+      
     }
 }
