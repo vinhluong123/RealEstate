@@ -17,10 +17,14 @@ namespace WebAdmin.Controllers
         }
 
         /// <summary>
-        /// Merged (Dev & Staging)That are comment define by Staging branch, that will conflick with Develop, that should resolving when merge code
         /// </summary>
         /// <returns></returns>
-        public async Task<IActionResult> Index()            
+        public IActionResult Index()            
+        {
+            return View();     
+        }
+
+        public async Task<IActionResult>  Privacy()
         {
             try
             {
@@ -31,12 +35,6 @@ namespace WebAdmin.Controllers
             {
                 throw new Exception(ex.ToString(), ex);
             }
-            
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
         }
 
         /// <summary>
