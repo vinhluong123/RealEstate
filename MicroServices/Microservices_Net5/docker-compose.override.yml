@@ -2,10 +2,15 @@ version: '3.4'
 
 networks:
   demoblazorapp:
+volumes:
+  sqlsystem:
+  sqldata:   
+  sqllog:
+  sqlbackup:
 
 services:
   demoappdb:
-    container_name: app-db
+    container_name: demoappdb
     image: mcr.microsoft.com/mssql/server:2019-latest
     ports:
       - 1433:1433
@@ -14,6 +19,11 @@ services:
       - SA_PASSWORD=12345678x@X
     networks:
       - demoblazorapp
+    volumes: 
+          - sqlsystem:/var/opt/mssql/
+          - sqldata:/var/opt/sqlserver/data
+          - sqllog:/var/opt/sqlserver/log
+          - sqlbackup:/var/opt/sqlserver/backup   
   demoblazorserverapp:
     container_name: demo-blazor-app
     image: microservicesapi
