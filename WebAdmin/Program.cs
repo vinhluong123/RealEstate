@@ -1,11 +1,11 @@
 using WebAdmin.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+ConfigurationManager configuration = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddHttpClient<IWeatherForecastService, WeatherForecastService>(c =>
-c.BaseAddress = new Uri("https://localhost:5001/"));
+builder.Services.AddHttpClient<IWeatherForecastService, WeatherForecastService>(c => c.BaseAddress = new Uri(configuration["ApiBaseUrl"]));
 
 
 var app = builder.Build();
