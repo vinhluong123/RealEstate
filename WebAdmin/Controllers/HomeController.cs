@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using WebAdmin.Helpers;
 using WebAdmin.Models;
 using WebAdmin.Services.Interfaces;
 
@@ -9,11 +10,13 @@ namespace WebAdmin.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IWeatherForecastService _forecastService;
+        private IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger, IWeatherForecastService forecastService)
+        public HomeController(ILogger<HomeController> logger, IWeatherForecastService forecastService, IConfiguration configuration)
         {
             _logger = logger;
             _forecastService = forecastService ?? throw new ArgumentNullException(nameof(forecastService));
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -21,6 +24,8 @@ namespace WebAdmin.Controllers
         /// <returns></returns>
         public IActionResult Index()            
         {
+            AzureCosmosDbExtension azureCosmosDb  = new AzureCosmosDbExtension(_configuration);
+            azureCosmosDb.TestAzureCosmosDb();
             return View();     
         }
 
