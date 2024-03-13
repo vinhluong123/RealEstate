@@ -1,4 +1,4 @@
-namespace RealEstateServices
+namespace RealEstateServices.Models
 {
     public class WeatherForecast
     {

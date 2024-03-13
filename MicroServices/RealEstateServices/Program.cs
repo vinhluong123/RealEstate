@@ -1,21 +1,18 @@
-using Microsoft.EntityFrameworkCore;
-using RealEstateServices.DBContexts;
-using System.Configuration;
+
+using RealEstateServices.Models;
+using RealEstateServices.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.Configure<BookStoreDatabaseSettings>(
+    builder.Configuration.GetSection("BookStoreDatabase"));
+builder.Services.AddSingleton<BooksService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-/// <summary>
-/// Add services config for Dbcontext
-/// </summary>
-builder.Services.AddDbContext<RealEstateContext>(options =>
-        options.UseSqlServer("Server=VINHLUONG-LAPTO\\VINHLUONG_SERVER;Database=RealEstateDb;User Id=sa;Password=12345678x@X"));
 
 var app = builder.Build();
 
@@ -26,8 +23,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Real Estate API v1"));
 }
-
-
 
 app.UseHttpsRedirection();
 
