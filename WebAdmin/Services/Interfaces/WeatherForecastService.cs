@@ -1,4 +1,5 @@
-﻿using WebAdmin.Helpers;
+﻿using System.Net.Http.Headers;
+using WebAdmin.Helpers;
 using WebAdmin.Models;
 
 namespace WebAdmin.Services.Interfaces
@@ -11,9 +12,12 @@ namespace WebAdmin.Services.Interfaces
         public WeatherForecastService(HttpClient client)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "Your Oauth token");
+
         }
         public async Task<IEnumerable<WeatherForecastModel>> Find()
         {
+            //var request = new reques
             var response = await _client.GetAsync(BasePath);
 
             return await response.ReadContentAsync<List<WeatherForecastModel>>();
