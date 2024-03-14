@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.OpenApi.Models;
 using stackup_docker_db_demo.DBProviders;
+using stackup_docker_db_demo.Repository;
 
 namespace stackup_docker_db_demo
 {
@@ -52,8 +53,11 @@ namespace stackup_docker_db_demo
 			//});
 			//services.AddSingleton<RedisProvider>();
 			services.AddSingleton<MongoProvider>();
-			//services.AddSingleton<PostgressProvider>();
-		}
+            //services.AddSingleton<PostgressProvider>();
+
+            services.AddScoped<IBlogPostRepository, BlogPostRepository>();
+			services.AddScoped<IBlogUserRepository, BlogUserRepository>();
+        }
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
