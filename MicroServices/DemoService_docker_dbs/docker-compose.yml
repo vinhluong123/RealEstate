@@ -1,0 +1,75 @@
+version: '3.4'
+
+services:
+  stackup_docker_db_demo:
+    image: ${DOCKER_REGISTRY-}stackupdockerdbdemo:v1
+    build:
+      context: .
+      dockerfile: stackup_docker_db_demo/Dockerfile
+    depends_on:
+      - stackupMongo
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development 
+      - "DatabaseSettings__MongoConnectionString=mongodb://admin:pass@stackupMongo:27017"
+      - "DatabaseSettings__PostgressConnectionString=host=stackupPostgres;Port=5432;Database=Stackup;User Id=admin;Password=admin;"
+      - "CacheSettings__RedisCache=stackupRedis:6379"
+    ports:
+      - "8080:80"
+  stackupMongo:
+    image: mongo
+    container_name: stackupMongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: "stackupMongodb"
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: pass
+    ports:
+      - "27017:27017"
+  mongo-express:
+    image: mongo-express
+    restart: always
+    depends_on:
+      - stackupMongo
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: pass
+      ME_CONFIG_MONGODB_URL: mongodb://admin:pass@stackupMongo:27017/
+
+  # stackupRedis:
+  #   image: redis:alpine
+  #   container_name: stackupRedis
+  #   restart: always
+  #   ports:
+  #     - "6379:6379"
+
+  # stackupPostgres:
+  #   image: postgres
+  #   container_name: stackupPostgres
+  #   restart: always
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     - POSTGRES_USER=admin
+  #     - POSTGRES_PASSWORD=admin
+  #     - POSTGRES_DB=stackup_postgress
+  #   volumes:
+  #     - stackup_postgres_data:/var/lib/postgresql/data/
+
+  # pgadmin:
+  #   container_name: pgadmin4_container
+  #   image: dpage/pgadmin4:6.17
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com
+  #     PGADMIN_DEFAULT_PASSWORD: password
+  #     PGADMIN_LISTEN_PORT: 80
+  #   ports:
+  #     - "8009:80"
+  #   volumes:
+  #     - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  stackup_postgres_data:
+  pgadmin-data:
