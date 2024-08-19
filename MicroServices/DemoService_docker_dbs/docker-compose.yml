@@ -25,6 +25,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: pass
     ports:
       - "27017:27017"
+    volumes: 
+      - mongodb_data:/data/db
   mongo-express:
     image: mongo-express
     restart: always
@@ -71,5 +73,6 @@ services:
   #     - pgadmin-data:/var/lib/pgadmin
 
 volumes:
+  mongodb_data:    
   stackup_postgres_data:
   pgadmin-data:

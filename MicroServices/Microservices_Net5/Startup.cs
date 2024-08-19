@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using Microservices_Net5.Repository;
 using Microservices_Net5.Helper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Serilog;
 
 namespace Microservices_Net5
 {
@@ -54,6 +55,9 @@ namespace Microservices_Net5
             }
 
             app.UseHttpsRedirection();
+
+            //Add support to logging request with SERILOG
+            //app.UseSerilogRequestLogging();
 
             app.UseRouting();
 

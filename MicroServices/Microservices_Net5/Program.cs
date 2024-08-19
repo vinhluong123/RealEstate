@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,12 @@ namespace Microservices_Net5
         public static void Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
+
+            Log.Logger = new LoggerConfiguration()
+           .ReadFrom.Configuration(new ConfigurationBuilder()
+               .AddJsonFile("appsettings.json")
+               .Build())
+           .CreateLogger();
 
             //Innit DB for first start
             using (var scope = host.Services.CreateScope())
@@ -36,12 +43,14 @@ namespace Microservices_Net5
             host.Run();
         }
 
-      
+
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog() // <-- This is important to ensure Serilog is used
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+                
     }
 }

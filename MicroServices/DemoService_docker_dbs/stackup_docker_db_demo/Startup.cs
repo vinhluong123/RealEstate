@@ -45,8 +45,14 @@ namespace stackup_docker_db_demo
 
 			services.AddSingleton<IMongoClient>(x =>
 			{
-				return new MongoClient(mongoConnectionString);
-			});
+                var settings = MongoClientSettings.FromConnectionString(mongoConnectionString);
+                // Set the ServerApi field of the settings object to set the version of the Stable API on the client
+                settings.ServerApi = new ServerApi(ServerApiVersion.V1);
+                // Create a new client and connect to the server
+                var client = new MongoClient(settings);
+				return client;
+                //return new MongoClient(mongoConnectionString);
+            });
 			//services.AddStackExchangeRedisCache(options =>
 			//{
 			//	options.Configuration = redisConnectionString;

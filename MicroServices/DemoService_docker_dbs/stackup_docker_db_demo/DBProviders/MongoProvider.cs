@@ -11,23 +11,23 @@ namespace stackup_docker_db_demo.DBProviders
     {
 		public IMongoClient _mongoClient;
 		public IMongoDatabase _mongoDatabase;
-		public IMongoCollection<BlogPost> BlogPosts { get; }
+		public IMongoCollection<BlogPost> _blogPosts { get; }
 
         public MongoProvider(IConfiguration config, IMongoClient _client)
         {
             _mongoClient = _client;
-            _mongoDatabase = _mongoClient.GetDatabase(config["DatabaseSettings:PostgressDB"]);
-            BlogPosts = _mongoDatabase.GetCollection<BlogPost>(config["DatabaseSettings:PostgressDBCollection"]);
+            _mongoDatabase = _mongoClient.GetDatabase(config["DatabaseSettings:MongoDB"]);
+            _blogPosts = _mongoDatabase.GetCollection<BlogPost>(config["DatabaseSettings:MongoCollection"]);
         }
 
         public async Task CreatePost(BlogPost post)
         {
-        	await BlogPosts.InsertOneAsync(post);
+        	await _blogPosts.InsertOneAsync(post);
         }
 
         public async Task<IEnumerable<BlogPost>> GetPost()
         {
-        	return await BlogPosts.Find(x => true).ToListAsync();
+        	return await _blogPosts.Find(x => true).ToListAsync();
         }
 
         public Task<IEnumerable<BlogPost>> UpdatePost(string id)
@@ -38,6 +38,11 @@ namespace stackup_docker_db_demo.DBProviders
         public Task<IEnumerable<BlogPost>> DeletePost(string id)
         {
             throw new System.NotImplementedException();
+        }
+
+        public async Task<IEnumerable<BlogPost>> GetPost(string id)
+        {
+            return (IEnumerable<BlogPost>)await _blogPosts.Find(b => b.Id.Equals(id)).FirstOrDefaultAsync();
         }
     }
 }

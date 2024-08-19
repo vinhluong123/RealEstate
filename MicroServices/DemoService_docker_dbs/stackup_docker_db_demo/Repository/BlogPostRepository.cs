@@ -15,8 +15,8 @@ namespace stackup_docker_db_demo.Repository
         public BlogPostRepository(IConfiguration config, IMongoClient _client)
         {
             _mongoClient = _client;
-            _mongoDatabase = _mongoClient.GetDatabase(config["DatabaseSettings:PostgressDB"]);
-            _blogPosts = _mongoDatabase.GetCollection<BlogPost>(config["DatabaseSettings:PostgressDBCollection"]);
+            _mongoDatabase = _mongoClient.GetDatabase(config["DatabaseSettings:MongoDB"]);
+            _blogPosts = _mongoDatabase.GetCollection<BlogPost>(config["DatabaseSettings:MongoCollection"]);
         }
 
         public async Task CreatePost(BlogPost post)
@@ -37,6 +37,11 @@ namespace stackup_docker_db_demo.Repository
         public Task<IEnumerable<BlogPost>> DeletePost(string id)
         {
             throw new System.NotImplementedException();
+        }
+
+        public async Task<IEnumerable<BlogPost>> GetPost(string id)
+        {
+            return (IEnumerable<BlogPost>)await _blogPosts.Find(b => b.Id.Equals(id)).FirstOrDefaultAsync();
         }
     }
 }
