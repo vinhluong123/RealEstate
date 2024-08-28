@@ -58,7 +58,7 @@ namespace Microservices_Net5.Controllers
         }
 
         /// <summary>
-        /// Add comment
+        /// Create student
         /// </summary>
         /// <param name="student"></param>
         /// <returns></returns>

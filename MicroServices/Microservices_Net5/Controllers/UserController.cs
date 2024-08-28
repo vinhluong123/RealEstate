@@ -18,6 +18,11 @@ namespace Microservices_Net5.Controllers
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Generate token base on user login
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>The token will be reponed and it have timeout</returns>
         [HttpPost]
         [Route("generateToken")]
         public IActionResult generateToken([FromBody] LoginModel user)
@@ -26,6 +31,10 @@ namespace Microservices_Net5.Controllers
             return Ok(new { Token = token });
         }
 
+        /// <summary>
+        /// Example to using Token to get user information base on token
+        /// </summary>
+        /// <returns>User inforamtion</returns>
         [Authorize]
         [HttpGet("profile")]
         public IActionResult UserProfile()

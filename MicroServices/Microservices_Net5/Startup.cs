@@ -9,6 +9,9 @@ using Microservices_Net5.Repository;
 using Microservices_Net5.Helper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Serilog;
+using System;
+using System.IO;
+using System.Reflection;
 
 namespace Microservices_Net5
 {
@@ -28,7 +31,27 @@ namespace Microservices_Net5
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Microservices_Net5", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Microservices_Net5",
+                    Version = "v1",
+                    Description = "This is the API for development testing only",
+                    TermsOfService = new Uri("https://www.example.com/terms"), // Use a valid URL
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Vinh Luong",
+                        Email = "abc@gmail.com",
+                        Url = new Uri("https://www.example.com/contact") // Use a valid URL
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Use under LICX",
+                        Url = new Uri("https://www.example.com/license") // Optional: Add if you have a license URL
+                    }
+                });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
 
             // For Entity Framework
